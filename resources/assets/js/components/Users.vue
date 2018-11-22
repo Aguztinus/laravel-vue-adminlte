@@ -72,6 +72,7 @@
                 <form @submit.prevent="editmode ? updateUser() : createUser()">
                 <div class="modal-body">
                      <div class="form-group">
+                        <label for="labelName">Name</label>
                         <input v-model="form.name" type="text" name="name"
                             placeholder="Name"
                             class="form-control" :class="{ 'is-invalid': form.errors.has('name') }">
@@ -79,6 +80,7 @@
                     </div>
 
                      <div class="form-group">
+                        <label for="labelEmail">Email Address</label>
                         <input v-model="form.email" type="email" name="email"
                             placeholder="Email Address"
                             class="form-control" :class="{ 'is-invalid': form.errors.has('email') }">
@@ -86,6 +88,7 @@
                     </div>
 
                      <div class="form-group">
+                       <label for="labelBio">Bio</label>
                         <textarea v-model="form.bio" name="bio" id="bio"
                         placeholder="Short bio for user (Optional)"
                         class="form-control" :class="{ 'is-invalid': form.errors.has('bio') }"></textarea>
@@ -94,6 +97,7 @@
 
 
                     <div class="form-group">
+                      <label for="labelType">Role</label>
                         <select name="type" v-model="form.type" id="type" class="form-control" :class="{ 'is-invalid': form.errors.has('type') }">
                             <option value="">Select User Role</option>
                             <option value="admin">Admin</option>
@@ -104,6 +108,7 @@
                     </div>
 
                     <div class="form-group">
+                      <label for="labelPassword">Password</label>
                         <input v-model="form.password" type="password" name="password" id="password"
                         class="form-control" :class="{ 'is-invalid': form.errors.has('password') }">
                         <has-error :form="form" field="password"></has-error>
@@ -128,129 +133,120 @@
 </template>
 
 <script>
-    export default {
-        data() {
-            return {
-                editmode: false,
-                users : {},
-                form: new Form({
-                    id:'',
-                    name : '',
-                    email: '',
-                    password: '',
-                    type: '',
-                    bio: '',
-                    photo: ''
-                })
-            }
-        },
-        methods: {
-            getResults(page = 1) {
-                        axios.get('api/user?page=' + page)
-                            .then(response => {
-                                this.users = response.data;
-                            });
-                },
-            updateUser(){
-                this.$Progress.start();
-                // console.log('Editing data');
-                this.form.put('api/user/'+this.form.id)
-                .then(() => {
-                    // success
-                    $('#addNew').modal('hide');
-                     swal(
-                        'Updated!',
-                        'Information has been updated.',
-                        'success'
-                        )
-                        this.$Progress.finish();
-                         Fire.$emit('AfterCreate');
-                })
-                .catch(() => {
-                    this.$Progress.fail();
-                });
-
-            },
-            editModal(user){
-                this.editmode = true;
-                this.form.reset();
-                $('#addNew').modal('show');
-                this.form.fill(user);
-            },
-            newModal(){
-                this.editmode = false;
-                this.form.reset();
-                $('#addNew').modal('show');
-            },
-            deleteUser(id){
-                swal({
-                    title: 'Are you sure?',
-                    text: "You won't be able to revert this!",
-                    type: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Yes, delete it!'
-                    }).then((result) => {
-
-                        // Send request to the server
-                         if (result.value) {
-                                this.form.delete('api/user/'+id).then(()=>{
-                                        swal(
-                                        'Deleted!',
-                                        'Your file has been deleted.',
-                                        'success'
-                                        )
-                                    Fire.$emit('AfterCreate');
-                                }).catch(()=> {
-                                    swal("Failed!", "There was something wronge.", "warning");
-                                });
-                         }
-                    })
-            },
-            loadUsers(){
-                if(this.$gate.isAdminOrAuthor()){
-                    axios.get("api/user").then(({ data }) => (this.users = data));
-                }
-            },
-
-            createUser(){
-                this.$Progress.start();
-
-                this.form.post('api/user')
-                .then(()=>{
-                    Fire.$emit('AfterCreate');
-                    $('#addNew').modal('hide')
-
-                    toast({
-                        type: 'success',
-                        title: 'User Created in successfully'
-                        })
-                    this.$Progress.finish();
-
-                })
-                .catch(()=>{
-
-                })
-            }
-        },
-        created() {
-            Fire.$on('searching',() => {
-                let query = this.$parent.search;
-                axios.get('api/findUser?q=' + query)
-                .then((data) => {
-                    this.users = data.data
-                })
-                .catch(() => {
-
-                })
+export default {
+  data() {
+    return {
+      editmode: false,
+      visible: false,
+      users: {},
+      form: new Form({
+        id: "",
+        name: "",
+        email: "",
+        password: "",
+        type: "",
+        bio: "",
+        photo: ""
+      })
+    };
+  },
+  methods: {
+    getResults(page = 1) {
+      axios.get("api/user?page=" + page).then(response => {
+        this.users = response.data;
+      });
+    },
+    updateUser() {
+      this.$Progress.start();
+      // console.log('Editing data');
+      this.form
+        .put("api/user/" + this.form.id)
+        .then(() => {
+          // success
+          $("#addNew").modal("hide");
+          swal("Updated!", "Information has been updated.", "success");
+          this.$Progress.finish();
+          Fire.$emit("AfterCreate");
+        })
+        .catch(() => {
+          this.$Progress.fail();
+        });
+    },
+    editModal(user) {
+      this.editmode = true;
+      this.form.reset();
+      $("#addNew").modal("show");
+      this.form.fill(user);
+    },
+    newModal() {
+      this.editmode = false;
+      this.form.reset();
+      $("#addNew").modal("show");
+    },
+    deleteUser(id) {
+      swal({
+        title: "Are you sure?",
+        text: "You won't be able to revert this!",
+        type: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, delete it!"
+      }).then(result => {
+        // Send request to the server
+        if (result.value) {
+          this.form
+            .delete("api/user/" + id)
+            .then(() => {
+              swal("Deleted!", "Your file has been deleted.", "success");
+              Fire.$emit("AfterCreate");
             })
-           this.loadUsers();
-           Fire.$on('AfterCreate',() => {
-               this.loadUsers();
-           });
-        //    setInterval(() => this.loadUsers(), 3000);
+            .catch(() => {
+              swal("Failed!", "There was something wronge.", "warning");
+            });
         }
+      });
+    },
+    loadUsers() {
+      if (this.$gate.isAdminOrAuthor()) {
+        axios.get("api/user").then(({ data }) => (this.users = data));
+      }
+    },
 
+    createUser() {
+      this.$Progress.start();
+      this.form
+        .post("api/user")
+        .then(() => {
+          Fire.$emit("AfterCreate");
+          $("#addNew").modal("hide");
+
+          toast({
+            type: "success",
+            title: "User Created in successfully"
+          });
+          this.$Progress.finish();
+        })
+        .catch(() => {
+          this.$Progress.fail();
+        });
     }
+  },
+  created() {
+    Fire.$on("searching", () => {
+      let query = this.$parent.search;
+      axios
+        .get("api/findUser?q=" + query)
+        .then(data => {
+          this.users = data.data;
+        })
+        .catch(() => {});
+    });
+    this.loadUsers();
+    Fire.$on("AfterCreate", () => {
+      this.loadUsers();
+    });
+    //    setInterval(() => this.loadUsers(), 3000);
+  }
+};
 </script>
