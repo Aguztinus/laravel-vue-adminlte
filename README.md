@@ -30,7 +30,7 @@ Let's Build a Multi-Purpose Laravel + Vue Application is out now. In this series
 
 It's just like any other Laravel project. Basically here is how you use it for yourself. (it's not completed yet) 
 
-* Clone the repo ` https://gitlab.com/Aguztinus/laravel-vue-adminlte.git `
+* Clone the repo ` git clone https://gitlab.com/Aguztinus/laravel-vue-adminlte.git `
 * `cd ` to project folder. 
 * Run ` composer install `
 * Save as the `.env.example` to `.env` and set your database information 
